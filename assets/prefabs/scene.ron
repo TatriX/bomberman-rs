@@ -9,48 +9,6 @@ Prefab (
     entities: [
         (
             data: (
-                graphics: (
-                    mesh: Shape((shape: Cube)),
-                    material: (
-                        albedo: Generate(Srgba(1.0, 1.0, 1.0, 1.0)),
-                    ),
-                ),
-                transform: (
-                    translation: (128.0, 128.0, 0.1),
-                    scale: (128.0, 128.0, 1.0),
-                ),
-            ),
-        ),
-	(
-            data: (
-                graphics: (
-                    mesh: Shape((shape: Sphere(32, 32))),
-                    material: (
-                        albedo: Generate(Srgba(0.0, 0.0, 1.0, 1.0)),
-                    ),
-                ),
-                transform: (
-                    translation: (128.0, 128.0, 0.1),
-                    scale: (128.0, 128.0, 1.0),
-                ),
-            ),
-        ),
-	// (
-        //     data: (
-        //         graphics: (
-        //             mesh: Shape((shape: Cube)),
-        //             material: (
-        //                 albedo: Generate(Srgba(1.0, 0.0, 0.0, 0.5)),
-        //             ),
-        //         ),
-        //         transform: (
-        //             translation: (0.0, 0.0, 0.2),
-        //             scale: (126.0, 126.0, 1.0),
-        //         ),
-        //     ),
-        // ),
-        (
-            data: (
                 light: (
                     ambient_color: (Srgba(1., 1., 1., 1.0)),
                 ),

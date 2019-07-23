@@ -92,17 +92,18 @@ impl GameplayState {
             .with(self.scene_handle.clone())
             .build();
 
-        let tile_size = 32.0;
-        let margin = 1.0;
-        let size = 5;
+        let padding = 64.0; // tiles container padding
+        let tile_half_extent = 32.0;
+        let margin = 1.0; // margin around tiles
+        let size = 15; // width & height
 
         for i in 0..size {
             for j in 0..size {
-                let x = 2.0 * (margin + tile_size) * i as f32;
-                let y = 2.0 * (margin + tile_size) * j as f32;
+                let x =  padding + tile_half_extent + 2.0 * (margin + tile_half_extent) * i as f32;
+                let y =  padding + tile_half_extent + 2.0 * (margin + tile_half_extent) * j as f32;
                 let mut transform = Transform::default();
                 transform.set_translation_xyz(x, y, 0.0);
-                transform.set_scale(Vector3::new(tile_size, tile_size, 1.0));
+                transform.set_scale(Vector3::new(tile_half_extent, tile_half_extent, 1.0));
 
                 world
                     .create_entity()

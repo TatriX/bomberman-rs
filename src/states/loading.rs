@@ -1,14 +1,11 @@
 use amethyst::{
-    assets::{
-        Handle, Prefab, PrefabLoader, ProgressCounter,
-        RonFormat,
-    },
+    assets::{Handle, Prefab, PrefabLoader, ProgressCounter, RonFormat},
     input::{is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
 };
 
-use crate::MyPrefabData;
 use super::GameplayState;
+use crate::MyPrefabData;
 
 #[derive(Default)]
 pub struct LoadingState {
@@ -53,10 +50,10 @@ impl SimpleState for LoadingState {
 
     fn update(&mut self, _data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         if self.progress_counter.is_complete() {
-            return Trans::Switch(Box::new(GameplayState{
+            return Trans::Switch(Box::new(GameplayState {
                 scene_handle: self.scene_handle.clone().unwrap(),
                 tile_handle: self.tile_handle.clone().unwrap(),
-            }))
+            }));
         }
         Trans::None
     }

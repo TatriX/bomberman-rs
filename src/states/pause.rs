@@ -1,5 +1,5 @@
-use amethyst::prelude::*;
 use amethyst::input::get_key;
+use amethyst::prelude::*;
 use log::info;
 
 pub struct PauseState;

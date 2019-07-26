@@ -4,7 +4,7 @@ Prefab (
         (
             data: (
                 graphics: (
-                    mesh: Shape((shape: Cube)),
+                    mesh: Shape((shape: Plane(None))),
                     material: (
                         albedo: Generate(Srgba(0.5, 0.0, 0.4, 1.0)),
                     ),

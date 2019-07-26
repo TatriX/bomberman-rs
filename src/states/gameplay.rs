@@ -99,17 +99,22 @@ impl GameplayState {
 
         for i in 0..size {
             for j in 0..size {
-                let x =  padding + tile_half_extent + 2.0 * (margin + tile_half_extent) * i as f32;
-                let y =  padding + tile_half_extent + 2.0 * (margin + tile_half_extent) * j as f32;
+                let x = padding + tile_half_extent + 2.0 * (margin + tile_half_extent) * i as f32;
+                let y = padding + tile_half_extent + 2.0 * (margin + tile_half_extent) * j as f32;
                 let mut transform = Transform::default();
                 transform.set_translation_xyz(x, y, 0.0);
                 transform.set_scale(Vector3::new(tile_half_extent, tile_half_extent, 1.0));
+                transform.set_rotation_euler(0.0, std::f32::consts::PI, 0.0);
 
                 world
                     .create_entity()
                     .with(self.tile_handle.clone())
                     .with(transform)
-                    .named(if i % 2 == 0 {"tile_left"} else { "tile_right"})
+                    .named(if i % 2 == 0 {
+                        "tile_left"
+                    } else {
+                        "tile_right"
+                    })
                     .build();
             }
         }

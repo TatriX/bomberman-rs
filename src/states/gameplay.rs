@@ -1,26 +1,23 @@
 use amethyst::{
-    assets::{
-        Handle, HotReloadStrategy, Prefab, AssetStorage, Loader,
-    },
-    window::ScreenDimensions,
+    assets::{AssetStorage, Handle, HotReloadStrategy, Loader, Prefab},
     core::math::Vector3,
-    ecs::Join,
-    core::Named,
     core::transform::Transform,
+    core::Named,
+    ecs::Join,
     input::{get_key, is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
-    renderer::{Camera, ImageFormat, SpriteRender, Texture, SpriteSheetFormat, SpriteSheet},
+    renderer::{Camera, ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
+    window::ScreenDimensions,
 };
 
-use log::info;
-use crate::MyPrefabData;
 use super::PauseState;
+use crate::MyPrefabData;
+use log::info;
 
 pub struct GameplayState {
     pub scene_handle: Handle<Prefab<MyPrefabData>>,
     pub tile_handle: Handle<Prefab<MyPrefabData>>,
 }
-
 
 impl SimpleState for GameplayState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -55,19 +52,16 @@ impl SimpleState for GameplayState {
 
     fn fixed_update(&mut self, data: StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         if true {
-            return Trans::None
+            return Trans::None;
         }
         let names = data.world.read_storage::<Named>();
         let mut transforms = data.world.write_storage::<Transform>();
         for (name, transform) in (&names, &mut transforms).join() {
             match &name.name[..] {
-                "tile_left" => {
+                "tile" => {
                     transform.move_left(1.0);
-                },
-                "tile_right" => {
-                    transform.move_right(1.0);
-                },
-                _ => {},
+                }
+                _ => {}
             }
         }
         Trans::None
@@ -92,6 +86,10 @@ impl GameplayState {
             .with(self.scene_handle.clone())
             .build();
 
+        self.create_grid(world);
+    }
+
+    fn create_grid(&self, world: &mut World) {
         let padding = 64.0; // tiles container padding
         let tile_half_extent = 32.0;
         let margin = 1.0; // margin around tiles
@@ -110,15 +108,12 @@ impl GameplayState {
                     .create_entity()
                     .with(self.tile_handle.clone())
                     .with(transform)
-                    .named(if i % 2 == 0 {
-                        "tile_left"
-                    } else {
-                        "tile_right"
-                    })
+                    .named("tile")
                     .build();
             }
         }
     }
+
 }
 
 fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {

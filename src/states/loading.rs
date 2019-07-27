@@ -67,7 +67,11 @@ impl SimpleState for LoadingState {
         self.bomberman_sprite = Some(SpriteRender {
             sprite_sheet: load_sprite_sheet(
                 "sprites/bomberman.ron",
-                load_texture("sprites/Bomberman/Front/Bman_F_f00.png", world, progress_counter),
+                load_texture(
+                    "sprites/Bomberman/Front/Bman_F_f00.png",
+                    world,
+                    progress_counter,
+                ),
                 world,
                 progress_counter,
             ),

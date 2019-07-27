@@ -1,12 +1,8 @@
+#![enable(implicit_some)]
 (
     texture_width: 64,
     texture_height: 128,
     sprites: [
-        (
-            x: 0,
-            y: 0,
-            width: 64,
-            height: 128,
-        ),
+        (x: 0,   y: 0, width: 64, height: 128, offsets: (0.0, -32.0)),
     ]
 )

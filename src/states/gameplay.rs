@@ -1,6 +1,5 @@
 use amethyst::{
     assets::{Handle, HotReloadStrategy, Prefab},
-    core::math::Vector3,
     core::transform::Transform,
     core::Named,
     ecs::Join,
@@ -17,6 +16,7 @@ use log::info;
 
 /// Padding between screen edge and the grid
 const PADDING: f32 = 64.0;
+const BLOCK_SIZE: f32 = 32.0; // block's half-extent
 
 pub struct GameplayState {
     pub scene_handle: Handle<Prefab<MyPrefabData>>,
@@ -93,23 +93,27 @@ impl GameplayState {
     }
 
     fn create_grid(&self, world: &mut World) {
-        let block_half_extent = 32.0;
         let margin = 1.0; // margin around tiles
         let width = 18;
         let height = 15;
 
         for i in 0..width {
             for j in 0..height {
-                let x = PADDING + block_half_extent + 2.0 * (margin + block_half_extent) * i as f32;
-                let y = PADDING + block_half_extent + 2.0 * (margin + block_half_extent) * j as f32;
+                let x = PADDING + BLOCK_SIZE + 2.0 * (margin + BLOCK_SIZE) * i as f32;
+                let y = PADDING + BLOCK_SIZE + 2.0 * (margin + BLOCK_SIZE) * j as f32;
                 let mut transform = Transform::default();
                 transform.set_translation_xyz(x, y, 0.0);
 
-                let (block, sprite) = match rand::random::<u8>() {
-                    0...100 => (Block::Background, self.block_sprites[0].clone()),
-                    100...110 => (Block::Explodable, self.block_sprites[1].clone()),
-                    110...240 => (Block::Solid, self.block_sprites[2].clone()),
-                    _ => (Block::Portal, self.block_sprites[3].clone()),
+                let (block, sprite) = if i == 0 || j == 0 || i == width-1 || j == height-1 {
+                    // edges of the level are always solid
+                    (Block::Solid, self.block_sprites[2].clone())
+                } else {
+                    match rand::random::<u8>() {
+                        0...200 => (Block::Background, self.block_sprites[0].clone()),
+                        200...220 => (Block::Explodable, self.block_sprites[1].clone()),
+                        220...240 => (Block::Solid, self.block_sprites[2].clone()),
+                        _ => (Block::Portal, self.block_sprites[3].clone()),
+                    }
                 };
 
                 world
@@ -124,14 +128,14 @@ impl GameplayState {
     }
 
     fn create_bomberman(&self, world: &mut World) {
-        let x = PADDING + 32.0;
-        let y = PADDING + 64.0;
+        let x = PADDING + 2.0*BLOCK_SIZE + 32.0;
+        let y = PADDING + 2.0*BLOCK_SIZE + 32.0;
         let mut transform = Transform::default();
         transform.set_translation_xyz(x, y, 0.1);
 
         world
             .create_entity()
-            .with(Bomberman {})
+            .with(Bomberman::default())
             .with(self.bomberman_sprite.clone())
             .with(transform)
             .named("bomberman")

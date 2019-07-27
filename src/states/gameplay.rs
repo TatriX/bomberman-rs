@@ -11,7 +11,7 @@ use amethyst::{
 };
 
 use super::PauseState;
-use crate::components::Bomberman;
+use crate::components::{Block, Bomberman};
 use crate::MyPrefabData;
 use log::info;
 
@@ -20,7 +20,7 @@ const PADDING: f32 = 64.0;
 
 pub struct GameplayState {
     pub scene_handle: Handle<Prefab<MyPrefabData>>,
-    pub tile_handle: Handle<Prefab<MyPrefabData>>,
+    pub block_sprites: Vec<SpriteRender>,
     pub bomberman_sprite: SpriteRender,
 }
 
@@ -93,24 +93,31 @@ impl GameplayState {
     }
 
     fn create_grid(&self, world: &mut World) {
-        let tile_half_extent = 32.0;
+        let block_half_extent = 32.0;
         let margin = 1.0; // margin around tiles
         let width = 18;
         let height = 15;
 
         for i in 0..width {
             for j in 0..height {
-                let x = PADDING + tile_half_extent + 2.0 * (margin + tile_half_extent) * i as f32;
-                let y = PADDING + tile_half_extent + 2.0 * (margin + tile_half_extent) * j as f32;
+                let x = PADDING + block_half_extent + 2.0 * (margin + block_half_extent) * i as f32;
+                let y = PADDING + block_half_extent + 2.0 * (margin + block_half_extent) * j as f32;
                 let mut transform = Transform::default();
                 transform.set_translation_xyz(x, y, 0.0);
-                transform.set_scale(Vector3::new(tile_half_extent, tile_half_extent, 1.0));
+
+                let (block, sprite) = match rand::random::<u8>() {
+                    0...100 => (Block::Background, self.block_sprites[0].clone()),
+                    100...110 => (Block::Explodable, self.block_sprites[1].clone()),
+                    110...240 => (Block::Solid, self.block_sprites[2].clone()),
+                    _ => (Block::Portal, self.block_sprites[3].clone()),
+                };
 
                 world
                     .create_entity()
-                    .with(self.tile_handle.clone())
+                    .with(block)
+                    .with(sprite)
                     .with(transform)
-                    .named("tile")
+                    .named("block")
                     .build();
             }
         }

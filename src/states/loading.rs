@@ -12,8 +12,8 @@ use crate::MyPrefabData;
 pub struct LoadingState {
     progress_counter: ProgressCounter,
     scene_handle: Option<Handle<Prefab<MyPrefabData>>>,
-    tile_handle: Option<Handle<Prefab<MyPrefabData>>>,
     bomberman_sprite: Option<SpriteRender>,
+    blocks_sprites: Option<Vec<SpriteRender>>,
 }
 
 fn load_prefab(
@@ -26,29 +26,20 @@ fn load_prefab(
     })
 }
 
-fn load_sprite(
+fn load_sprite_sheet(
     path: &str,
+    texture_handle: Handle<Texture>,
     world: &mut World,
     progress_counter: &mut ProgressCounter,
-) -> SpriteRender {
-    let texture_handle = load_texture(path, world, progress_counter);
-    // Load the spritesheet definition file, which contains metadata on our
-    // spritesheet texture.
-    let sheet_handle = {
-        let loader = world.read_resource::<Loader>();
-        let sheet_storage = world.read_resource::<AssetStorage<SpriteSheet>>();
-        loader.load(
-            "sprites/bomberman.ron", // TODO: extract me
-            SpriteSheetFormat(texture_handle),
-            progress_counter,
-            &sheet_storage,
-        )
-    };
-
-    SpriteRender {
-        sprite_sheet: sheet_handle,
-        sprite_number: 0,
-    }
+) -> Handle<SpriteSheet> {
+    let loader = world.read_resource::<Loader>();
+    let sheet_storage = world.read_resource::<AssetStorage<SpriteSheet>>();
+    loader.load(
+        path,
+        SpriteSheetFormat(texture_handle),
+        progress_counter,
+        &sheet_storage,
+    )
 }
 
 fn load_texture(
@@ -69,15 +60,35 @@ fn load_texture(
 impl SimpleState for LoadingState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
-
         let progress_counter = &mut self.progress_counter;
+
         self.scene_handle = Some(load_prefab("prefabs/scene.ron", world, progress_counter));
-        self.tile_handle = Some(load_prefab("prefabs/tile.ron", world, progress_counter));
-        self.bomberman_sprite = Some(load_sprite(
-            "sprites/Bomberman/Front/Bman_F_f00.png",
+
+        self.bomberman_sprite = Some(SpriteRender {
+            sprite_sheet: load_sprite_sheet(
+                "sprites/bomberman.ron",
+                load_texture("sprites/Bomberman/Front/Bman_F_f00.png", world, progress_counter),
+                world,
+                progress_counter,
+            ),
+            sprite_number: 0,
+        });
+
+        let blocks_sprite_sheet = load_sprite_sheet(
+            "sprites/blocks.ron",
+            load_texture("sprites/blocks.png", world, progress_counter),
             world,
             progress_counter,
-        ))
+        );
+
+        self.blocks_sprites = Some(
+            (0..4)
+                .map(|i| SpriteRender {
+                    sprite_sheet: blocks_sprite_sheet.clone(),
+                    sprite_number: i,
+                })
+                .collect(),
+        );
     }
 
     fn handle_event(
@@ -98,9 +109,9 @@ impl SimpleState for LoadingState {
     fn update(&mut self, _data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
         if self.progress_counter.is_complete() {
             return Trans::Switch(Box::new(GameplayState {
-                scene_handle: self.scene_handle.clone().unwrap(),
-                tile_handle: self.tile_handle.clone().unwrap(),
-                bomberman_sprite: self.bomberman_sprite.clone().unwrap(),
+                scene_handle: self.scene_handle.take().unwrap(),
+                block_sprites: self.blocks_sprites.take().unwrap(),
+                bomberman_sprite: self.bomberman_sprite.take().unwrap(),
             }));
         }
         Trans::None

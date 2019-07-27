@@ -1,7 +1,12 @@
 use amethyst::ecs::prelude::{Component, DenseVecStorage};
 
-pub struct Bomberman {}
+pub enum Block {
+    Background,
+    Explodable,
+    Solid,
+    Portal,
+}
 
-impl Component for Bomberman {
+impl Component for Block {
     type Storage = DenseVecStorage<Self>;
 }

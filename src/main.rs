@@ -1,6 +1,7 @@
 use amethyst::{
     assets::{HotReloadBundle, HotReloadStrategy, PrefabLoaderSystem, Processor},
     core::transform::TransformBundle,
+    input::{InputBundle, StringBindings},
     prelude::*,
     renderer::{
         rendy::mesh::{Normal, Position, TexCoord},
@@ -12,8 +13,10 @@ use amethyst::{
     window::WindowBundle,
 };
 
+mod components;
 mod render;
 mod states;
+mod systems;
 
 use states::LoadingState;
 
@@ -30,11 +33,20 @@ fn main() -> amethyst::Result<()> {
     let render_graph = render::RenderGraph::default();
     let render_system = RenderingSystem::<DefaultBackend, _>::new(render_graph);
 
+    let input_bundle =
+        InputBundle::<StringBindings>::new().with_bindings_from_file(assets.join("input.ron"))?;
+
     let game_data = GameDataBuilder::default()
         .with_bundle(WindowBundle::from_config_path(display_config))?
         .with_bundle(HotReloadBundle::new(HotReloadStrategy::when_triggered()))?
         .with(PrefabLoaderSystem::<MyPrefabData>::default(), "", &[])
         .with_bundle(TransformBundle::new())?
+        .with_bundle(input_bundle)?
+        .with(
+            systems::BombermanSystem,
+            "bomberman_system",
+            &["input_system"],
+        )
         .with(
             SpriteVisibilitySortingSystem::new(),
             "sprite_visibility_system",

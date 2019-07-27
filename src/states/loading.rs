@@ -2,7 +2,7 @@ use amethyst::{
     assets::{AssetStorage, Handle, Loader, Prefab, PrefabLoader, ProgressCounter, RonFormat},
     input::{is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
-    renderer::{ImageFormat, Texture, SpriteRender, SpriteSheet, SpriteSheetFormat},
+    renderer::{ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
 };
 
 use super::GameplayState;
@@ -51,7 +51,11 @@ fn load_sprite(
     }
 }
 
-fn load_texture(path: &str, world: &mut World, progress_counter: &mut ProgressCounter) -> Handle<Texture> {
+fn load_texture(
+    path: &str,
+    world: &mut World,
+    progress_counter: &mut ProgressCounter,
+) -> Handle<Texture> {
     let loader = world.read_resource::<Loader>();
     let texture_storage = world.read_resource::<AssetStorage<Texture>>();
     loader.load(
@@ -61,7 +65,6 @@ fn load_texture(path: &str, world: &mut World, progress_counter: &mut ProgressCo
         &texture_storage,
     )
 }
-
 
 impl SimpleState for LoadingState {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {

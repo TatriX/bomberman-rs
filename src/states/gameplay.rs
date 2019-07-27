@@ -11,6 +11,7 @@ use amethyst::{
 };
 
 use super::PauseState;
+use crate::components::Bomberman;
 use crate::MyPrefabData;
 use log::info;
 
@@ -42,7 +43,10 @@ impl SimpleState for GameplayState {
             // Listen to any key events
             if let Some(event) = get_key(&event) {
                 info!("handling key event: {:?}", event);
+            }
 
+            if is_key_down(&event, VirtualKeyCode::R) {
+                info!("HotReload triggered");
                 data.world.write_resource::<HotReloadStrategy>().trigger();
                 self.reload_scene(data.world);
             }
@@ -120,6 +124,7 @@ impl GameplayState {
 
         world
             .create_entity()
+            .with(Bomberman {})
             .with(self.bomberman_sprite.clone())
             .with(transform)
             .named("bomberman")

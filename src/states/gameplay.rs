@@ -104,7 +104,7 @@ impl GameplayState {
                 let mut transform = Transform::default();
                 transform.set_translation_xyz(x, y, 0.0);
 
-                let (block, sprite) = if i == 0 || j == 0 || i == width-1 || j == height-1 {
+                let (block, sprite) = if i == 0 || j == 0 || i == width - 1 || j == height - 1 {
                     // edges of the level are always solid
                     (Block::Solid, self.block_sprites[2].clone())
                 } else {
@@ -128,8 +128,8 @@ impl GameplayState {
     }
 
     fn create_bomberman(&self, world: &mut World) {
-        let x = PADDING + 2.0*BLOCK_SIZE + 32.0;
-        let y = PADDING + 2.0*BLOCK_SIZE + 32.0;
+        let x = PADDING + 2.0 * BLOCK_SIZE + 32.0;
+        let y = PADDING + 2.0 * BLOCK_SIZE + 32.0;
         let mut transform = Transform::default();
         transform.set_translation_xyz(x, y, 0.1);
 

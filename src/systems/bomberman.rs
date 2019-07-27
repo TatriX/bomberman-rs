@@ -26,8 +26,7 @@ impl<'s> System<'s> for BombermanSystem {
             let vx = input.axis_value("move_x").unwrap_or(0.0) as f32 * speed;
             let vy = input.axis_value("move_y").unwrap_or(0.0) as f32 * speed;
 
-            let new_x = x + vx;
-            let new_y = y + vy;
+            bomberman.velocity = [vx as f32, vy as f32];
 
             // calculate collision box as (bomberman.width/2 + block.width/2)
             let half_width = (32 + 32) as f32;
@@ -36,24 +35,44 @@ impl<'s> System<'s> for BombermanSystem {
             for (block, transform) in (&blocks, &transforms).join() {
                 match block {
                     Block::Background => continue,
-                    _ => {},
+                    _ => {}
                 }
                 let block_x = transform.translation().x.as_f32();
                 let block_y = transform.translation().y.as_f32();
 
-                if point_in_rect(
-                    new_x,
-                    new_y,
-                    block_x - half_width,
-                    block_y - half_height,
-                    block_x + half_width,
-                    block_y + half_height,
-                ) {
-                    return;
+                let collides = |dx, dy| {
+                    point_in_rect(
+                        x + dx,
+                        y + dy,
+                        block_x - half_width,
+                        block_y - half_height,
+                        block_x + half_width,
+                        block_y + half_height,
+                    )
+                };
+
+                if collides(vx, 0.0) {
+                    bomberman.velocity[0] = 0.0;
+                    if vy == 0.0 {
+                        bomberman.velocity[1] = match block_y - y {
+                            dy if dy < -30.0 && !collides(0.0, speed) => speed,
+                            dy if dy >  30.0 && !collides(0.0, -speed) => -speed,
+                            _ => bomberman.velocity[1]
+                        };
+                    }
+                }
+
+                if collides(0.0, vy) {
+                    bomberman.velocity[1] = 0.0;
+                    if vx == 0.0 {
+                        bomberman.velocity[0] = match block_x - x {
+                            dx if dx < -30.0 && !collides(speed, 0.0) => speed,
+                            dx if dx >  30.0 && !collides(-speed, 0.0) => -speed,
+                            _ => bomberman.velocity[0]
+                        };
+                    }
                 }
             }
-
-            bomberman.velocity = [vx as f32, vy as f32];
         }
 
         // if no collision was detected adjust position according to velocity

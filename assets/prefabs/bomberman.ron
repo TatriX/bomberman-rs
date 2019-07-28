@@ -27,13 +27,14 @@ Prefab(
                             ),
                         )),
                         sprites: [
-                            Grid((
+                            List((
                                 texture_width: 512,
                                 texture_height: 128,
-                                columns: 8,
-                                rows: 1,
-                                // Shifts the grid by 32 pixels down and the bat changes to brown
-                                // position: (0, 32),
+                                sprites: [
+                                    (x: 0, y: 0, width: 64, height: 128, offsets: (0, -32)),
+                                    (x: 64, y: 0, width: 64, height: 128, offsets: (0, -32)),
+                                    (x: 128, y: 0, width: 64, height: 128, offsets: (0, -32)),
+                                ],
                             )),
                         ],
                         // optional
@@ -50,7 +51,7 @@ Prefab(
                     animations: [
                         (
                             // AnimationId
-                            Fly,
+                            Walk,
                             (
                                 samplers: [
                                     (
@@ -58,10 +59,13 @@ Prefab(
                                         // Only SpriteIndex channel allowed for SpriteRender in AnimationSetPrefab
                                         SpriteIndex,
                                         (
+                                            input: [0.0, 0.2],
+                                            output: [1, 2],
+
                                             // Time of key frames
-                                            input: [0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4],
+                                            // input: [0.0, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4],
                                             // Sprite indexes from SpriteSheet for key frames
-                                            output: [5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 4],
+                                            // output: [5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 4],
                                             // Sprites can only ever be animated with Step
                                             function: Step,
                                         ),

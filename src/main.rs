@@ -1,5 +1,5 @@
 use amethyst::{
-    animation::AnimationSetPrefab,
+    animation::{AnimationSetPrefab, AnimationBundle},
     assets::{
         HotReloadBundle, HotReloadStrategy, PrefabData, PrefabLoaderSystem, Processor,
         ProgressCounter,
@@ -32,7 +32,7 @@ use states::LoadingState;
 /// Animation ids used in a AnimationSet
 #[derive(Eq, PartialOrd, PartialEq, Hash, Debug, Copy, Clone, Deserialize, Serialize)]
 pub enum AnimationId {
-    Fly,
+    Walk,
 }
 
 #[derive(Debug, Clone, Deserialize, PrefabData)]
@@ -66,6 +66,7 @@ fn main() -> amethyst::Result<()> {
             &[],
         )
         .with_bundle(TransformBundle::new())?
+    .with_bundle(AnimationBundle::<AnimationId, SpriteRender>::new("sprite_animation_control", "sprite_animation_sampling"))?
         .with_bundle(input_bundle)?
         .with(
             systems::BombermanSystem,

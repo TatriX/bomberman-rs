@@ -105,7 +105,7 @@ impl SimpleState for LoadingState {
                 info!("Loading completed");
                 return Trans::Switch(Box::new(GameplayState {
                     block_sprites: self.blocks_sprites.take().unwrap(),
-                    // bomberman_handle: self.bomberman_handle.take().unwrap(),
+                    bomberman_handle: self.bomberman_handle.take().unwrap(),
                 }));
             },
             Completion::Loading => {

@@ -11,7 +11,7 @@ use amethyst::{
 
 use super::PauseState;
 use crate::components::{Block, Bomberman};
-use crate::MyPrefabData;
+use crate::BombermanPrefabData;
 use log::info;
 
 /// Padding between screen edge and the grid
@@ -19,9 +19,8 @@ const PADDING: f32 = 64.0;
 const BLOCK_SIZE: f32 = 32.0; // block's half-extent
 
 pub struct GameplayState {
-    pub scene_handle: Handle<Prefab<MyPrefabData>>,
     pub block_sprites: Vec<SpriteRender>,
-    pub bomberman_sprite: SpriteRender,
+    // pub bomberman_handle: Handle<Prefab<BombermanPrefabData>>,
 }
 
 impl SimpleState for GameplayState {
@@ -81,15 +80,11 @@ impl GameplayState {
         world.delete_all();
 
         let dimensions = world.read_resource::<ScreenDimensions>().clone();
-        init_camera(world, &dimensions);
-
-        world
-            .create_entity()
-            .with(self.scene_handle.clone())
-            .build();
 
         self.create_grid(world);
-        self.create_bomberman(world);
+        // self.create_bomberman(world);
+
+        init_camera(world, &dimensions);
     }
 
     fn create_grid(&self, world: &mut World) {
@@ -127,20 +122,20 @@ impl GameplayState {
         }
     }
 
-    fn create_bomberman(&self, world: &mut World) {
-        let x = PADDING + 2.0 * BLOCK_SIZE + 32.0;
-        let y = PADDING + 2.0 * BLOCK_SIZE + 32.0;
-        let mut transform = Transform::default();
-        transform.set_translation_xyz(x, y, 0.1);
+    // fn create_bomberman(&self, world: &mut World) {
+    //     let x = PADDING + 2.0 * BLOCK_SIZE + 32.0;
+    //     let y = PADDING + 2.0 * BLOCK_SIZE + 32.0;
+    //     let mut transform = Transform::default();
+    //     transform.set_translation_xyz(x, y, 0.1);
 
-        world
-            .create_entity()
-            .with(Bomberman::default())
-            .with(self.bomberman_sprite.clone())
-            .with(transform)
-            .named("bomberman")
-            .build();
-    }
+    //     world
+    //         .create_entity()
+    //         .with(Bomberman::default())
+    //         .with(self.bomberman_handle.clone())
+    //         .with(transform)
+    //         .named("bomberman")
+    //         .build();
+    // }
 }
 
 fn init_camera(world: &mut World, dimensions: &ScreenDimensions) {

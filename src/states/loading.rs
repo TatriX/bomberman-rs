@@ -1,18 +1,18 @@
 use amethyst::{
-    assets::{AssetStorage, Handle, Loader, Prefab, PrefabLoader, ProgressCounter, RonFormat},
+    assets::{AssetStorage, Handle, Loader, Prefab, PrefabLoader, ProgressCounter, RonFormat, Completion},
     input::{is_close_requested, is_key_down, VirtualKeyCode},
     prelude::*,
     renderer::{ImageFormat, SpriteRender, SpriteSheet, SpriteSheetFormat, Texture},
 };
 
+use log::info;
 use super::GameplayState;
-use crate::MyPrefabData;
+use crate::BombermanPrefabData;
 
 #[derive(Default)]
 pub struct LoadingState {
     progress_counter: ProgressCounter,
-    scene_handle: Option<Handle<Prefab<MyPrefabData>>>,
-    bomberman_sprite: Option<SpriteRender>,
+    bomberman_handle: Option<Handle<Prefab<BombermanPrefabData>>>,
     blocks_sprites: Option<Vec<SpriteRender>>,
 }
 
@@ -20,8 +20,8 @@ fn load_prefab(
     path: &str,
     world: &mut World,
     progress_counter: &mut ProgressCounter,
-) -> Handle<Prefab<MyPrefabData>> {
-    world.exec(|loader: PrefabLoader<'_, MyPrefabData>| {
+) -> Handle<Prefab<BombermanPrefabData>> {
+    world.exec(|loader: PrefabLoader<'_, BombermanPrefabData>| {
         loader.load(path, RonFormat, progress_counter)
     })
 }
@@ -62,21 +62,7 @@ impl SimpleState for LoadingState {
         let world = data.world;
         let progress_counter = &mut self.progress_counter;
 
-        self.scene_handle = Some(load_prefab("prefabs/scene.ron", world, progress_counter));
-
-        self.bomberman_sprite = Some(SpriteRender {
-            sprite_sheet: load_sprite_sheet(
-                "sprites/bomberman.ron",
-                load_texture(
-                    "sprites/Bomberman/Front/Bman_F_f00.png",
-                    world,
-                    progress_counter,
-                ),
-                world,
-                progress_counter,
-            ),
-            sprite_number: 0,
-        });
+        self.bomberman_handle = Some(load_prefab("prefabs/bomberman.ron", world, progress_counter));
 
         let blocks_sprite_sheet = load_sprite_sheet(
             "sprites/blocks.ron",
@@ -111,13 +97,22 @@ impl SimpleState for LoadingState {
     }
 
     fn update(&mut self, _data: &mut StateData<'_, GameData<'_, '_>>) -> SimpleTrans {
-        if self.progress_counter.is_complete() {
-            return Trans::Switch(Box::new(GameplayState {
-                scene_handle: self.scene_handle.take().unwrap(),
-                block_sprites: self.blocks_sprites.take().unwrap(),
-                bomberman_sprite: self.bomberman_sprite.take().unwrap(),
-            }));
+        match self.progress_counter.complete() {
+            Completion::Failed => {
+                panic!("Loading failed");
+            },
+            Completion::Complete => {
+                info!("Loading completed");
+                return Trans::Switch(Box::new(GameplayState {
+                    block_sprites: self.blocks_sprites.take().unwrap(),
+                    // bomberman_handle: self.bomberman_handle.take().unwrap(),
+                }));
+            },
+            Completion::Loading => {
+                info!("Loading...");
+            }
         }
+
         Trans::None
     }
 }

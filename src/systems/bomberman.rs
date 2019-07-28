@@ -56,8 +56,8 @@ impl<'s> System<'s> for BombermanSystem {
                     if vy == 0.0 {
                         bomberman.velocity[1] = match block_y - y {
                             dy if dy < -30.0 && !collides(0.0, speed) => speed,
-                            dy if dy >  30.0 && !collides(0.0, -speed) => -speed,
-                            _ => bomberman.velocity[1]
+                            dy if dy > 30.0 && !collides(0.0, -speed) => -speed,
+                            _ => bomberman.velocity[1],
                         };
                     }
                 }
@@ -67,8 +67,8 @@ impl<'s> System<'s> for BombermanSystem {
                     if vx == 0.0 {
                         bomberman.velocity[0] = match block_x - x {
                             dx if dx < -30.0 && !collides(speed, 0.0) => speed,
-                            dx if dx >  30.0 && !collides(-speed, 0.0) => -speed,
-                            _ => bomberman.velocity[0]
+                            dx if dx > 30.0 && !collides(-speed, 0.0) => -speed,
+                            _ => bomberman.velocity[0],
                         };
                     }
                 }

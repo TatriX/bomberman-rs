@@ -1,17 +1,26 @@
 use amethyst::{
-    assets::{HotReloadBundle, HotReloadStrategy, PrefabLoaderSystem, Processor},
+    animation::AnimationSetPrefab,
+    assets::{
+        HotReloadBundle, HotReloadStrategy, PrefabData, PrefabLoaderSystem, Processor,
+        ProgressCounter,
+    },
     core::transform::TransformBundle,
+    derive::PrefabData,
+    ecs::Entity,
+    error::Error,
     input::{InputBundle, StringBindings},
     prelude::*,
     renderer::{
-        rendy::mesh::{Normal, Position, TexCoord},
+        sprite::{prefab::SpriteScenePrefab, SpriteRender},
         sprite_visibility::SpriteVisibilitySortingSystem,
         types::DefaultBackend,
         RenderingSystem, SpriteSheet,
     },
-    utils::{application_root_dir, scene::BasicScenePrefab},
+    utils::application_root_dir,
     window::WindowBundle,
 };
+
+use serde::{Deserialize, Serialize};
 
 mod components;
 mod render;
@@ -20,10 +29,22 @@ mod systems;
 
 use states::LoadingState;
 
-pub type MyPrefabData = BasicScenePrefab<(Vec<Position>, Vec<Normal>, Vec<TexCoord>)>;
+/// Animation ids used in a AnimationSet
+#[derive(Eq, PartialOrd, PartialEq, Hash, Debug, Copy, Clone, Deserialize, Serialize)]
+pub enum AnimationId {
+    Fly,
+}
+
+#[derive(Debug, Clone, Deserialize, PrefabData)]
+pub struct BombermanPrefabData {
+    pub sprite_scene: SpriteScenePrefab,
+    pub animation_set: AnimationSetPrefab<AnimationId, SpriteRender>,
+}
 
 fn main() -> amethyst::Result<()> {
-    amethyst::start_logger(Default::default());
+    amethyst::Logger::from_config(Default::default())
+        .level_for("gfx_backend_vulkan", log::LevelFilter::Error)
+        .start();
 
     let app_root = application_root_dir()?;
 
@@ -39,7 +60,11 @@ fn main() -> amethyst::Result<()> {
     let game_data = GameDataBuilder::default()
         .with_bundle(WindowBundle::from_config_path(display_config))?
         .with_bundle(HotReloadBundle::new(HotReloadStrategy::when_triggered()))?
-        .with(PrefabLoaderSystem::<MyPrefabData>::default(), "", &[])
+        .with(
+            PrefabLoaderSystem::<BombermanPrefabData>::default(),
+            "",
+            &[],
+        )
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         .with(
